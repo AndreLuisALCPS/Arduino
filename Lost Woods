@@ -1,53 +1,83 @@
-// Lost Woods (Saria's Song)
+const int buttonPin = 2;     // pushbutton
+const int ledPin = 13;       // LED (optional for feedback)
+const int speakerPin = 11;   // speaker
 
-// Pin where the buzzer is connected
-const int buzzerPin = 8;
+const int songLength = 88;
 
-// Note frequencies (in Hz)
-#define NOTE_C4  262
-#define NOTE_D4  294
-#define NOTE_E4  330
-#define NOTE_F4  349
-#define NOTE_G4  392
-#define NOTE_A4  440
-#define NOTE_B4  494
-#define NOTE_C5  523
-#define NOTE_D5  587
-#define NOTE_E5  659
-
-// Melody of Lost Woods (excerpt)
-int melody[] = {
-  NOTE_G4, NOTE_A4, NOTE_B4, NOTE_C5,
-  NOTE_D5, NOTE_E5, NOTE_D5, NOTE_C5,
-  NOTE_B4, NOTE_C5, NOTE_D5, NOTE_E5,
-  NOTE_G4, NOTE_E5, NOTE_D5, NOTE_C5
+int notes[] = {
+  698,880,988,698,880,988,698,880,988,1319,1175,988,1047,988,784,659,587,659,784,659,
+  698,880,988,698,880,988,698,880,988,1319,1175,988,1047,1319,988,784,988,784,587,659,
+  587,659,698,784,880,988,1047,988,659,698,784,880,988,1047,1175,1319,1397,1568,
+  587,659,698,784,880,988,1047,988,659,
+  784,698,880,784,988,880,1047,988,1175,1047,1319,1175,1397,1319,1319,1397,1175,1319,
+  0,0,0
 };
 
-// Note durations: 4 = quarter note, 8 = eighth note, etc.
-int noteDurations[] = {
-  8, 8, 8, 8,
-  8, 8, 8, 8,
-  8, 8, 8, 8,
-  4, 8, 8, 4
+int beats[] = {
+  2,2,4,2,2,4,2,2,2,2,4,2,2,2,2,8,2,2,2,10,
+  2,2,4,2,2,4,2,2,2,2,4,2,2,2,2,8,2,2,2,10,
+  2,2,4,2,2,4,2,2,8,2,2,4,2,2,4,2,2,8,
+  2,2,4,2,2,4,2,2,8,
+  2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,6,
+  4,2,2
 };
+
+int tempo = 120;
+
+int buttonState = HIGH;         // Current button state
+int lastButtonState = HIGH;     // Previous button state
+bool isPlaying = false;         // Is the song playing?
+unsigned long lastDebounceTime = 0;
+unsigned long debounceDelay = 50;  // milliseconds
 
 void setup() {
-  // nothing to do in setup
+  pinMode(buttonPin, INPUT_PULLUP);  // Use internal pull-up
+  pinMode(speakerPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);           // Optional for feedback
 }
 
 void loop() {
-  int notesCount = sizeof(melody) / sizeof(melody[0]);
-  
-  for (int i = 0; i < notesCount; i++) {
-    int noteDuration = 1000 / noteDurations[i];
-    tone(buzzerPin, melody[i], noteDuration);
-    // to distinguish notes, add a brief pause between them
-    int pauseBetweenNotes = noteDuration * 1.30;
-    delay(pauseBetweenNotes);
-    // stop the tone playing
-    noTone(buzzerPin);
+  int reading = digitalRead(buttonPin);
+
+  // Debounce the button
+  if (reading != lastButtonState) {
+    lastDebounceTime = millis();
   }
-  
-  // pause before repeating
-  delay(1000);
+
+  if ((millis() - lastDebounceTime) > debounceDelay) {
+    if (reading != buttonState) {
+      buttonState = reading;
+
+      // Button press detected
+      if (buttonState == LOW) {
+        isPlaying = !isPlaying;  // Toggle play state
+        digitalWrite(ledPin, isPlaying ? HIGH : LOW);  // Optional LED
+      }
+    }
+  }
+
+  lastButtonState = reading;
+
+  if (isPlaying) {
+    for (int i = 0; i < songLength && isPlaying; i++) {
+      int duration = beats[i] * tempo;
+
+      if (notes[i] == 0) {
+        delay(duration);
+      } else {
+        tone(speakerPin, notes[i], duration);
+        delay(duration);
+      }
+
+      delay(tempo / 10);  // Pause between notes
+
+      // Check for button press to stop mid-song
+      reading = digitalRead(buttonPin);
+      if (reading == LOW) {
+        isPlaying = false;
+        digitalWrite(ledPin, LOW); // Optional LED off
+        break;
+      }
+    }
+  }
 }
