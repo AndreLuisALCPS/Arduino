@@ -1,6 +1,10 @@
+
 const int buttonPin = 2;     // pushbutton
-const int ledPin = 13;       // LED (optional for feedback)
-const int speakerPin = 11;   // speaker
+const int ledPin = 13;       // LED indicador (opcional)
+const int speakerPin = 11;   // alto-falante
+
+const int led1Pin = 3;       // LED rítmico 1
+const int led2Pin = 4;       // LED rítmico 2
 
 const int songLength = 88;
 
@@ -24,22 +28,24 @@ int beats[] = {
 
 int tempo = 120;
 
-int buttonState = HIGH;         // Current button state
-int lastButtonState = HIGH;     // Previous button state
-bool isPlaying = false;         // Is the song playing?
+int buttonState = HIGH;         // Estado atual do botão
+int lastButtonState = HIGH;     // Estado anterior do botão
+bool isPlaying = false;         // Música em execução?
 unsigned long lastDebounceTime = 0;
-unsigned long debounceDelay = 50;  // milliseconds
+unsigned long debounceDelay = 50;  // Debounce (ms)
 
 void setup() {
-  pinMode(buttonPin, INPUT_PULLUP);  // Use internal pull-up
+  pinMode(buttonPin, INPUT_PULLUP);  // Pino do botão com pull-up interno
   pinMode(speakerPin, OUTPUT);
-  pinMode(ledPin, OUTPUT);           // Optional for feedback
+  pinMode(ledPin, OUTPUT);           // LED indicador
+  pinMode(led1Pin, OUTPUT);          // LED rítmico 1
+  pinMode(led2Pin, OUTPUT);          // LED rítmico 2
 }
 
 void loop() {
   int reading = digitalRead(buttonPin);
 
-  // Debounce the button
+  // Debounce
   if (reading != lastButtonState) {
     lastDebounceTime = millis();
   }
@@ -48,10 +54,10 @@ void loop() {
     if (reading != buttonState) {
       buttonState = reading;
 
-      // Button press detected
+      // Detectou pressionamento
       if (buttonState == LOW) {
-        isPlaying = !isPlaying;  // Toggle play state
-        digitalWrite(ledPin, isPlaying ? HIGH : LOW);  // Optional LED
+        isPlaying = !isPlaying;  // Alterna entre tocar/parar
+        digitalWrite(ledPin, isPlaying ? HIGH : LOW);  // LED indicador
       }
     }
   }
@@ -62,6 +68,10 @@ void loop() {
     for (int i = 0; i < songLength && isPlaying; i++) {
       int duration = beats[i] * tempo;
 
+      // Liga LEDs rítmicos
+      digitalWrite(led1Pin, HIGH);
+      digitalWrite(led2Pin, HIGH);
+
       if (notes[i] == 0) {
         delay(duration);
       } else {
@@ -69,13 +79,19 @@ void loop() {
         delay(duration);
       }
 
-      delay(tempo / 10);  // Pause between notes
+      // Desliga LEDs
+      digitalWrite(led1Pin, LOW);
+      digitalWrite(led2Pin, LOW);
 
-      // Check for button press to stop mid-song
+      delay(tempo / 10);  // Pausa entre notas
+
+      // Verifica se o botão foi pressionado para parar
       reading = digitalRead(buttonPin);
       if (reading == LOW) {
         isPlaying = false;
-        digitalWrite(ledPin, LOW); // Optional LED off
+        digitalWrite(ledPin, LOW);
+        digitalWrite(led1Pin, LOW);
+        digitalWrite(led2Pin, LOW);
         break;
       }
     }
