@@ -1,9 +1,8 @@
-
 const int buttonPin = 2;     // pushbutton
-const int speakerPin = 11;   // alto-falante
-const int led1Pin = 3;       // LED
-const int led2Pin = 4;       // LED 
-const int led3Pin = 5;       // LED 
+const int speakerPin = 10;   // alto-falante
+const int led1Pin = 11;       // LED
+const int led2Pin = 12;       // LED 
+const int led3Pin = 13;       // LED 
 
 const int songLength = 88;
 
@@ -56,7 +55,6 @@ void loop() {
       // Detectou pressionamento
       if (buttonState == LOW) {
         isPlaying = !isPlaying;  // Alterna entre tocar/parar
-        digitalWrite(ledPin, isPlaying ? HIGH : LOW);  // LED indicador
       }
     }
   }
@@ -89,9 +87,9 @@ void loop() {
       reading = digitalRead(buttonPin);
       if (reading == LOW) {
         isPlaying = false;
-        digitalWrite(ledPin, LOW);
         digitalWrite(led1Pin, LOW);
         digitalWrite(led2Pin, LOW);
+        digitalWrite(led3Pin, LOW);
         break;
       }
     }
