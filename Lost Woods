@@ -1,10 +1,9 @@
 
 const int buttonPin = 2;     // pushbutton
-const int ledPin = 13;       // LED indicador (opcional)
 const int speakerPin = 11;   // alto-falante
-
-const int led1Pin = 3;       // LED rítmico 1
-const int led2Pin = 4;       // LED rítmico 2
+const int led1Pin = 3;       // LED
+const int led2Pin = 4;       // LED 
+const int led3Pin = 5;       // LED 
 
 const int songLength = 88;
 
@@ -37,9 +36,9 @@ unsigned long debounceDelay = 50;  // Debounce (ms)
 void setup() {
   pinMode(buttonPin, INPUT_PULLUP);  // Pino do botão com pull-up interno
   pinMode(speakerPin, OUTPUT);
-  pinMode(ledPin, OUTPUT);           // LED indicador
-  pinMode(led1Pin, OUTPUT);          // LED rítmico 1
-  pinMode(led2Pin, OUTPUT);          // LED rítmico 2
+  pinMode(led1Pin, OUTPUT);           // LED
+  pinMode(led2Pin, OUTPUT);          // LED
+  pinMode(led3Pin, OUTPUT);          // LED
 }
 
 void loop() {
@@ -71,6 +70,7 @@ void loop() {
       // Liga LEDs rítmicos
       digitalWrite(led1Pin, HIGH);
       digitalWrite(led2Pin, HIGH);
+      digitalWrite(led3Pin, HIGH);
 
       if (notes[i] == 0) {
         delay(duration);
