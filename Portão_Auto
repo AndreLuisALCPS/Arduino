@@ -13,37 +13,35 @@ void setup() {
   pinMode(buttonPin, INPUT_PULLUP);  // Botão entre pino e GND
   pinMode(ledPin, OUTPUT);
   myServo.attach(servoPin);
-  myServo.write(90);  // Posição neutra do servo
+  myServo.write(90);  // Parado inicialmente
 }
 
 void loop() {
-  // Lê o estado do botão (LOW = pressionado)
   if (digitalRead(buttonPin) == LOW && !buttonPressed && !running) {
     buttonPressed = true;
     running = true;
 
     digitalWrite(ledPin, HIGH);  // Liga o LED
 
-    // Gira no sentido horário (posição 0 graus)
+    // Gira no sentido horário (menor que 90)
     myServo.write(0);
     delay(10000);
 
-    // Espera 15 segundos
+    // Para
     myServo.write(90);
     delay(15000);
 
-    // Gira no sentido anti-horário (posição 180 graus)
+    // Gira no sentido anti-horário (maior que 90)
     myServo.write(180);
     delay(10000);
 
-    // Para o servo e desliga o LED
+    // Para e desliga LED
     myServo.write(90);
     digitalWrite(ledPin, LOW);
 
     running = false;
   }
 
-  // Libera o botão (aguarda ele ser solto)
   if (digitalRead(buttonPin) == HIGH) {
     buttonPressed = false;
   }
